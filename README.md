@@ -1,282 +1,168 @@
-# RouteX — Intelligent Last-Mile Delivery Optimizer
-> **"Select smarter. Route faster. Deliver on time."**
-> 
-> *College DAA PBL (Project-Based Learning) Flagship Project*  
-> **Topic:** Last-Mile Delivery with Deadlines (0/1 Knapsack DP + Dijkstra + Greedy Heuristics + Timeline Feasibility)
+<div align="center">
+  <img src="https://img.icons8.com/color/96/000000/delivery.png" alt="RouteX Logo" width="80" height="80">
+  
+  # RouteX — Intelligent Last-Mile Delivery Optimizer
+  
+  **"Select smarter. Route faster. Deliver on time."**
+
+  <p align="center">
+    <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react" alt="React"></a>
+    <a href="https://fastapi.tiangolo.com/"><img src="https://img.shields.io/badge/FastAPI-0.110-009688?style=for-the-badge&logo=fastapi" alt="FastAPI"></a>
+    <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python" alt="Python"></a>
+    <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript" alt="TypeScript"></a>
+    <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?style=for-the-badge&logo=tailwind-css" alt="Tailwind"></a>
+  </p>
+
+  *A Production-Grade College DAA PBL (Project-Based Learning) Flagship Project*<br>
+  **Topic:** Last-Mile Delivery with Deadlines (0/1 Knapsack DP + Dijkstra + Greedy Heuristics)
+</div>
 
 ---
 
-## 1. Project Overview & Problem Statement
+## 📸 Application Previews
+
+*(Add screenshots of your application here after running it! Just replace the placeholder image links.)*
+
+| Dashboard & Metrics | Interactive Map & Route Simulator |
+| :---: | :---: |
+| <img src="https://placehold.co/600x400/0f172a/60a5fa?text=Dashboard+Screenshot" alt="Dashboard" width="100%"> | <img src="https://placehold.co/600x400/0f172a/60a5fa?text=Map+Screenshot" alt="Interactive Map" width="100%"> |
+| **0/1 Knapsack DP Visualizer** | **Greedy Priority Scheduling** |
+| <img src="https://placehold.co/600x400/0f172a/60a5fa?text=DP+Table+Screenshot" alt="DP Table" width="100%"> | <img src="https://placehold.co/600x400/0f172a/60a5fa?text=Schedule+Screenshot" alt="Schedule" width="100%"> |
+
+---
+
+## 🚀 1. Project Overview & Problem Statement
 
 In contemporary urban logistics, last-mile delivery represents over **53% of total logistics costs**. Small and medium-sized delivery operators operate under strict vehicle weight limits, variable road traffic, and tight customer delivery deadlines. When customer demand exceeds vehicle capacity ($C$), dispatchers face a critical combinatorial optimization problem:
 
-1. **Order Acceptance Problem:** Which delivery requests must be accepted to maximize total profit while strictly obeying vehicle payload capacity?
-2. **Order Rejection Problem:** Which orders must be rejected because their inclusion yields suboptimal profit or causes deadline violations?
-3. **Dispatch Sequencing Problem:** In what sequence should accepted orders be delivered to ensure all customer delivery windows are satisfied?
-4. **Network Routing Problem:** What is the shortest-travel path across the urban road network accounting for real-time traffic congestion?
-5. **Timeline Feasibility:** Can every customer order be fulfilled on time, and what is the slack time margin?
+1. 📦 **Order Acceptance:** Which delivery requests must be accepted to maximize total profit while strictly obeying vehicle payload capacity?
+2. 🚫 **Order Rejection:** Which orders must be rejected because their inclusion yields suboptimal profit or causes deadline violations?
+3. 🚚 **Dispatch Sequencing:** In what sequence should accepted orders be delivered to ensure all customer delivery windows are satisfied?
+4. 🗺️ **Network Routing:** What is the shortest-travel path across the urban road network accounting for real-time traffic congestion?
+5. ⏱️ **Timeline Feasibility:** Can every customer order be fulfilled on time, and what is the slack time margin?
 
 **RouteX** is a production-grade algorithmic decision-support and route-optimization system designed to solve this multi-stage pipeline deterministically without mock data or simulated numbers.
 
 ---
 
-## 2. Multi-Stage Algorithmic Architecture
+## 🧠 2. Multi-Stage Algorithmic Architecture
 
 The optimization pipeline executes in five sequential algorithmic stages:
 
 ```mermaid
 flowchart TD
-    A["Delivery Requests Pool (n orders) & Vehicle Specs (Capacity C, Depot)"] --> B["Stage 1: Road Network Analysis (Dijkstra's Algorithm)"]
-    B --> C["Stage 2: Optimal Delivery Selection (0/1 Knapsack Dynamic Programming)"]
-    C --> D["Stage 3: Multi-Factor Greedy Dispatch Sequencing"]
-    D --> E["Stage 4: Operational Constraint & Timeline Validation"]
-    E --> F["Stage 5: Strategy Benchmarking & GIS Map Visualization"]
+    A["📦 Delivery Requests Pool (n orders) & Vehicle Specs"] --> B["🗺️ Stage 1: Road Network Analysis (Dijkstra)"]
+    B --> C["💰 Stage 2: Optimal Selection (0/1 Knapsack DP)"]
+    C --> D["🚚 Stage 3: Multi-Factor Greedy Sequencing"]
+    D --> E["⏱️ Stage 4: Constraint & Timeline Validation"]
+    E --> F["📊 Stage 5: Benchmarking & GIS Map Viz"]
 ```
 
 ---
 
-## 3. Detailed Algorithmic Formulations & Complexity
+## 🔬 3. Detailed Algorithmic Formulations & Complexity
 
 ### Algorithm A: 0/1 Knapsack via Dynamic Programming (Order Selection)
 - **Role:** Selects the global profit-maximizing subset of deliveries that fits within integer vehicle capacity $C$.
 - **Assumption:** Vehicle capacity is discretized into kilograms ($1\text{ kg}$ resolution).
 - **Recurrence Relation:**
   $$\text{dp}[i][c] = \begin{cases} \max\left(\text{dp}[i-1][c],\, \text{profit}[i] + \text{dp}[i-1][c - \text{weight}[i]]\right) & \text{if } \text{weight}[i] \le c \\ \text{dp}[i-1][c] & \text{otherwise} \end{cases}$$
-- **Backtracking:** Reconstructs the exact list of accepted delivery IDs by walking backward from $\text{dp}[n][C]$:
-  $$\text{if } \text{dp}[i][c] \neq \text{dp}[i-1][c] \implies \text{Delivery } i \text{ is SELECTED, } c \leftarrow c - \text{weight}[i]$$
-- **Complexity:**
-  - **Time Complexity:** $\mathcal{O}(n \cdot C)$
-  - **Space Complexity:** $\mathcal{O}(n \cdot C)$
-  - **Classification:** Exact Optimal Algorithm.
+- **Complexity:** Time $\mathcal{O}(n \cdot C)$ | Space $\mathcal{O}(n \cdot C)$ | **Globally Optimal**
 
 ### Algorithm B: Dijkstra's Shortest Path Algorithm (Network Travel Times)
 - **Role:** Finds the shortest road network travel path and duration between transfer hubs and delivery waypoints.
-- **Graph Formulation:** Weighted undirected graph $G = (V, E)$, with edge weights representing travel times scaled by a dynamic traffic multiplier:
-  $$\text{Weight}(u, v) = \text{base\_travel\_time}(u, v) \times \text{traffic\_multiplier}$$
-- **Implementation:** Binary min-heap priority queue via Python `heapq`.
-- **Complexity:**
-  - **Time Complexity:** $\mathcal{O}((V + E) \log V)$
-  - **Space Complexity:** $\mathcal{O}(V + E)$
-  - **Classification:** Exact Optimal Single-Source Shortest Path.
+- **Graph Formulation:** Weighted undirected graph $G = (V, E)$, with dynamic traffic multiplier.
+- **Complexity:** Time $\mathcal{O}((V + E) \log V)$ | Space $\mathcal{O}(V + E)$ | **Globally Optimal**
 
 ### Algorithm C: Deadline-Aware Greedy Heuristic (Route Construction)
 - **Role:** Sequences accepted deliveries into an efficient delivery schedule starting and terminating at the Depot.
-- **Formulas:**
-  $$\text{Urgency}_i = 1 + \max\left(0,\, \frac{\text{MaxDeadline} - \text{RemainingTime}_i}{\text{MaxDeadline}}\right)$$
-  $$\text{PriorityScore}_i = \frac{\text{Profit}_i \times \text{Urgency}_i}{\max(0.1, \text{Weight}_i) \times \max(1.0, \text{EstimatedTravelTime}_i)}$$
-- **Heuristic Step:**
-  1. At current time $T$ and location $L$, evaluate all unvisited accepted deliveries.
-  2. Compute travel time from $L \to \text{Pickup}_i \to \text{Drop}_i$.
-  3. Verify deadline feasibility: $\text{Slack}_i = \text{Deadline}_i - (T + \text{TravelTime}) \ge 0$.
-  4. Greedily select candidate with highest $\text{PriorityScore}_i$.
-  5. Advance vehicle clock by travel time $+$ service time, and set current location to $\text{Drop}_i$.
-  6. Return to Depot when all deliveries are satisfied.
-- **Complexity:**
-  - **Time Complexity:** $\mathcal{O}(k^2)$, where $k \le n$ is the number of selected deliveries.
-  - **Space Complexity:** $\mathcal{O}(k)$.
-  - **Classification:** Heuristic (Approximation).
+- **Formulas:** Priority Score considers Urgency, Profit, Weight, and Estimated Travel Time.
+- **Complexity:** Time $\mathcal{O}(k^2)$ | Space $\mathcal{O}(k)$ | **Practical Heuristic**
 
 ### Algorithm D: Constraint & Schedule Validator
-- **Role:** Verifies all physical and contract guarantees:
-  1. $\sum \text{weight}_i \le C$ (Payload limit)
-  2. $\text{ETA}_i \le \text{Deadline}_i \implies \text{Slack}_i \ge 0$ (On-time guarantee)
-  3. $T_{\text{total}} \le \text{MaxOperatingTime}$ (Driver shift limit)
-  4. Pickup Precedence: $\text{Pickup}_i$ stop occurs before $\text{Drop}_i$.
-  5. Route continuity: Consecutive legs share waypoints.
+- **Role:** Verifies all physical and contract guarantees (Capacity, Slack $\ge 0$, Precedence).
 
 ---
 
-## 4. Academic Complexity Comparison Table
+## 💻 4. Technology Stack
 
-| Algorithm | Primary Role | Time Complexity | Space Complexity | Mathematical Nature | Optimality Guarantee |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **0/1 Knapsack DP** | Payload Selection | $\mathcal{O}(n \cdot C)$ | $\mathcal{O}(n \cdot C)$ | Dynamic Programming | **Globally Optimal** |
-| **Dijkstra** | Road Routing | $\mathcal{O}((V+E)\log V)$ | $\mathcal{O}(V+E)$ | Greedy / Min-Heap | **Globally Optimal** |
-| **Deadline Greedy** | Route Sequencing | $\mathcal{O}(k^2)$ | $\mathcal{O}(k)$ | Multi-Factor Heuristic | **Practical Heuristic** |
-| **Schedule Validator**| Feasibility Check | $\mathcal{O}(k)$ | $\mathcal{O}(k)$ | Constraint Audit | **Exact Verification** |
+### Backend
+- **Python 3.10+**: Core algorithm logic and numeric scaling.
+- **FastAPI**: Asynchronous REST API Engine.
+- **Pydantic v2**: Data validation and strict typing.
+- **Pytest**: 19 automated tests for rigorous algorithm verification.
 
----
-
-## 5. Technology Stack
-
-- **Backend:**
-  - Python 3.14+
-  - FastAPI (REST API Engine)
-  - Pydantic v2 (Data Validation & Schemas)
-  - Uvicorn (ASGI Production Server)
-  - Pytest (Automated Algorithm & API Test Suite)
-- **Frontend:**
-  - React 19 + TypeScript
-  - Vite (Build Tool & HMR Dev Server)
-  - Tailwind CSS v4 (Modern Dark Navy Logistics Design System)
-  - Leaflet & OpenStreetMap (Interactive GIS Route Mapping)
-  - Recharts (Algorithmic Comparative Analytics)
-  - Lucide React (Icons)
+### Frontend
+- **React 19 + TypeScript**: Modern component-based SPA architecture.
+- **Vite**: Lightning-fast build tool and dev server.
+- **Tailwind CSS v4**: Beautiful, dark navy SaaS logistics design system.
+- **Leaflet & OpenStreetMap**: Interactive GIS route mapping.
+- **Recharts**: Algorithmic comparative analytics.
 
 ---
 
-## 6. Project Structure
-
-```
-PBL_DAA/
-├── backend/
-│   ├── app/
-│   │   ├── algorithms/
-│   │   │   ├── knapsack.py     # 0/1 Knapsack DP + backtracking + visualizer trace
-│   │   │   ├── dijkstra.py     # Binary min-heap Dijkstra + relaxation trace
-│   │   │   ├── greedy.py       # Deadline-aware multi-factor greedy router
-│   │   │   ├── routing.py      # End-to-end coordinator & 3-strategy comparison
-│   │   │   └── validation.py   # Timeline, capacity, and precedence validation
-│   │   ├── data/
-│   │   │   └── dataset.py      # 10 urban nodes, 25+ road edges, 15 deliveries
-│   │   ├── models/
-│   │   │   └── schemas.py      # Pydantic data contracts
-│   │   └── main.py             # FastAPI REST endpoints
-│   ├── tests/
-│   │   ├── test_knapsack.py    # Unit tests for Knapsack edge cases
-│   │   ├── test_dijkstra.py    # Unit tests for Dijkstra on graphs
-│   │   ├── test_greedy.py      # Unit tests for greedy routing & deadlines
-│   │   ├── test_validation.py  # Unit tests for constraints
-│   │   └── test_api.py         # Integration tests for REST endpoints
-│   └── .venv/                  # Python virtual environment
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── Header.tsx               # Top action bar with quick run
-│   │   │   ├── Sidebar.tsx              # Dark navigation drawer
-│   │   │   ├── MetricCard.tsx           # KPI status card
-│   │   │   ├── MapComponent.tsx         # Leaflet interactive map & markers
-│   │   │   ├── DeliveryModal.tsx        # Add/edit order modal
-│   │   │   └── VehicleSettingsModal.tsx # Vehicle payload configuration
-│   │   ├── pages/
-│   │   │   ├── DashboardPage.tsx        # Screen 1: Operational overview
-│   │   │   ├── DeliveriesPage.tsx       # Screen 2: Delivery CRUD management
-│   │   │   ├── MapRoutePage.tsx         # Screen 3: Interactive GIS map
-│   │   │   ├── OptimizationPage.tsx     # Screens 4, 5, 8: 3-step pipeline
-│   │   │   ├── VisualizerPage.tsx       # Deep DAA step-by-step visualizer
-│   │   │   ├── SimulationPage.tsx       # Screen 7: What-If sensitivity sliders
-│   │   │   ├── ComparisonPage.tsx       # Screen 6: 3-Strategy benchmarking
-│   │   │   └── ReportsPage.tsx          # Screen 10: Dispatch manifest & Viva
-│   │   ├── services/
-│   │   │   └── api.ts                   # Backend REST client
-│   │   ├── types/
-│   │   │   └── index.ts                 # TypeScript type interfaces
-│   │   ├── App.tsx                      # Root component
-│   │   ├── main.tsx                     # React entrypoint
-│   │   └── index.css                    # Tailwind v4 & Leaflet theme
-│   ├── package.json
-│   └── vite.config.ts
-├── README.md                            # Comprehensive academic documentation
-└── run.bat                              # One-click dual launcher script
-```
-
----
-
-## 7. Installation & Quick Start
+## ⚙️ 5. Installation & Quick Start
 
 ### Prerequisites
-- Python 3.10+ (Tested on Python 3.14)
-- Node.js 18+ (Tested on v24.18)
+- [Python 3.10+](https://www.python.org/downloads/)
+- [Node.js 18+](https://nodejs.org/)
 
-### Step 1: Clone or Navigate to Directory
+### Quick Start (Windows)
+
+Simply clone the repository and run the provided startup script:
+
 ```bash
-cd c:\Users\asus\Desktop\PBL_DAA
+git clone https://github.com/yasheswar/RouteX.git
+cd RouteX
+./run.bat
 ```
+*(This script will automatically install all Python and NPM dependencies and launch both servers!)*
 
-### Step 2: Backend Setup
+### Manual Setup
+
+<details>
+<summary>Click here for manual setup instructions</summary>
+
+**Terminal 1: Backend**
 ```bash
-# Create and activate virtual environment
-python -m venv backend\.venv
-backend\.venv\Scripts\activate
-
-# Install backend dependencies
+cd backend
+python -m venv .venv
+.venv\Scripts\activate
 pip install fastapi uvicorn pydantic pytest httpx
-
-# Run automated tests
-pytest backend/tests -v
+$env:PYTHONPATH="."
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8001
 ```
 
-### Step 3: Frontend Setup
+**Terminal 2: Frontend**
 ```bash
 cd frontend
 npm install
-npm run build
+npm run dev
 ```
-
-### Step 4: Run Application
-**Option A: One-Click Startup Script (Windows)**
-Run `run.bat` in the root folder.
-
-**Option B: Manual Terminal Execution**
-- **Terminal 1 (Backend):**
-  ```bash
-  cd c:\Users\asus\Desktop\PBL_DAA
-  $env:PYTHONPATH="."
-  backend\.venv\Scripts\python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8001
-  ```
-- **Terminal 2 (Frontend):**
-  ```bash
-  cd c:\Users\asus\Desktop\PBL_DAA\frontend
-  npm run dev
-  ```
-- Open your browser at: **`http://localhost:5173`**
+</details>
 
 ---
 
-## 8. Guided 5–10 Minute Viva Demonstration Script
+## 🎓 6. Guided Viva Demonstration Script
 
-1. **Open the Application (`http://localhost:5173`)**:
-   - Point out the dark navy SaaS logistics aesthetic, matching the reference design montage.
-   - Show the 4 top metrics: Total Profit (₹3,010), Deliveries (selected vs total), Distance (km), and Vehicle Load (19 / 20 kg, 95% utilized).
-2. **Interactive Viva Defense Mode (`🎓 Viva Defense Mode` in Header)**:
-   - Click the prominent **"🎓 Viva Defense Mode"** button in the top navigation bar.
-   - **Tab 1 (Live Recurrence Calculator):** Pick any order and sub-capacity to show the exact arithmetic behind Bellman's equation evaluating `INCLUDE` vs `EXCLUDE`.
-   - **Tab 2 (Asymptotic Complexities):** Show the formal Big-O proofs and comparison against non-optimal algorithms.
-   - **Tab 3 (Faculty Stress-Tests):** Click *"Severe Peak-Hour Traffic (2.0x)"* or *"Fleet Capacity Crunch (12 kg)"* to demonstrate instant real-time algorithmic recalculation.
-   - **Tab 4 (Examiner Q&A):** Review the model defense answers for the toughest faculty questions.
-3. **Multi-Stage Optimization (`Optimization` Tab)**:
-   - **Tab 1 (DP Selection):** Show the 2D DP Table with cyan/blue highlighted optimal backtracking path. Click any cell to trigger the **DP Cell Inspector**.
-   - **Tab 2 (Greedy Prioritization):** Show the mathematical formula banner and ranking table with Urgency and Priority scores.
-   - **Tab 3 (Detailed Schedule):** Show the exact timeline with Vehicle Load (kg), Arrival, Departure, Deadline, and Slack ($+\text{min}$ on time).
-4. **Algorithm Visualizer (`Visualizer` Tab)**:
-   - Play/step through cell-by-cell evaluations of the Knapsack table with plain-English comparisons ("Include yields Rs.X > Exclude Rs.Y").
-   - Switch to Dijkstra to show min-heap extraction and edge relaxation.
-   - Switch to Greedy to show vehicle dispatch decisions step by step.
-5. **Interactive Map & Live Vehicle Simulator (`Map & Route` Tab)**:
-   - Watch the animated delivery van move stop-by-stop along the route with live payload and timeline HUD updates.
-6. **Algorithm Comparison (`Comparison` Tab)**:
-   - Show side-by-side bar charts comparing **Nearest Neighbor**, **Profit-based Greedy**, and **RouteX (DP + Greedy + Dijkstra)** on the identical dataset.
-   - Highlight why RouteX achieves higher profit (Rs. 3,010) and higher on-time rates.
-7. **What-If Simulation (`Simulation` Tab)**:
-   - Adjust vehicle capacity or traffic multiplier and run deterministic sensitivity tests.
-8. **Reports & Viva Dossier (`Reports` Tab)**:
-   - Show the formal asymptotic complexity table, print manifest, and CSV export.
+1. **Open the Application (`http://localhost:5173`)**: Point out the dark navy SaaS logistics aesthetic. Show the 4 top metrics.
+2. **Interactive Viva Defense Mode**: Click the **"🎓 Viva Defense Mode"** button in the top navigation bar. Demonstrate the Live Recurrence Calculator and Faculty Stress-Tests.
+3. **Multi-Stage Optimization**: Show the DP Selection Table, the Greedy Prioritization logic, and the Detailed Dispatch Schedule.
+4. **Interactive Map & Live Simulator**: Watch the animated delivery van move stop-by-stop along the route with live payload and timeline HUD updates.
+5. **What-If Simulation**: Adjust vehicle capacity or traffic multiplier and run deterministic sensitivity tests.
 
 ---
 
-## 9. Automated Testing & Verification
+## ✅ 7. Automated Testing
 
-19 comprehensive automated tests verify all algorithms:
-- `test_knapsack_normal`: Verifies knapsack selection and backtracking.
-- `test_knapsack_zero_capacity`: Zero capacity handling.
-- `test_knapsack_item_heavier_than_capacity`: Excludes overweight items.
-- `test_knapsack_multiple_optimal`: Handles multiple solutions deterministically.
-- `test_knapsack_fractional_weights`: Fixed-point scaling ensuring fractional weights never exceed capacity.
-- `test_dijkstra_normal_graph`: Shortest path and min travel time.
-- `test_dijkstra_single_node` & `test_dijkstra_disconnected_graph`: Graph edge cases.
-- `test_greedy_feasible_deliveries`: Proper stop sequencing and depot return.
-- `test_greedy_impossible_deadlines`: Flags late deliveries with negative slack.
-- `test_validation_capacity_violation` & `test_validation_deadline_violation`: Audits physical constraints.
-- `test_api_*`: Full REST integration verification across all endpoints.
+19 comprehensive automated tests verify all algorithms including knapsack fractional scaling, dijkstra disconnections, greedy impossible deadlines, and validation violations.
 
-Run all tests:
 ```bash
-backend\.venv\Scripts\pytest -v
+cd backend
+.venv\Scripts\pytest -v
 ```
 
 ---
-
-## 10. Authors & Academic Credits
-- **Project:** RouteX — Intelligent Last-Mile Delivery Optimizer
-- **Course:** Design & Analysis of Algorithms (DAA) — Project-Based Learning (PBL)
-- **Topic:** Last-Mile Delivery with Deadlines
+<div align="center">
+Made with ❤️ for DAA PBL
+</div>
